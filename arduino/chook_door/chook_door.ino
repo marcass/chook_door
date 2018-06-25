@@ -1,4 +1,6 @@
-/* Photocell simple testing sketch. 
+  
+#include "LowPower.h"
+/* Photocell sensor sketch for contorlling chook gate. 
  
 Connect one end of the photocell to 5V, the other end to Analog 0.
 Then connect one end of a 10K resistor from Analog 0 to ground 
@@ -62,16 +64,16 @@ void setup(void) {
   #endif
 }
 
-int find_state(light){
+int find_state(int light){
   if (light > OPEN_THRESH){
     state = STATE_OPENING;
   }
-  elif (light < CLOSE_THRESH){
+  else if (light < CLOSE_THRESH){
     state = STATE_CLOSING;
   }else{
     state = STATE_UNKNOWN; //light intensity at hysterisi point or sensor failure
   }
-  return state
+  return state;
 }
 
 void goToSleep(){
@@ -80,6 +82,10 @@ void goToSleep(){
   #endif
   #ifdef production
 //    sleep
+    isInterrupted = 0;
+    attachInterrupt;
+    LowPower.powerDown(SLEEP_8S); // sleep for 8s
+    delay(75); // allows the arduino to fully wake up.
   #endif
 }
 
@@ -100,7 +106,6 @@ void openDoor(){
     state = STATE_DAY;
   }
 }
-}
  
 void loop(void) {
   #ifdef debug
@@ -115,7 +120,6 @@ void loop(void) {
     //now we have to map 0-1023 to 0-255 since thats the range analogWrite uses
     LEDbrightness = map(photocellReading, 0, 1023, 0, 255);
     analogWrite(LEDpin, LEDbrightness);
-   
     delay(100);
   #endif
   #ifdef producton
