@@ -124,6 +124,7 @@ void goToSleep(){
   #endif
 }
 
+// https://tronixlabs.com.au/news/tutorial-l298n-dual-motor-controller-module-2a-and-arduino/
 void closeDoor(){
   //motor going for too long?
   if (millis() - motor_timer > MOTOR_TIME){
