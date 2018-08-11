@@ -28,21 +28,22 @@ const int STATE_ERROR = 5;
 int state = 4;
 
 //Outputs
-#define CLOSE_REL 6
-#define OPEN_REL 7
+//#define ENA 6 //ONLY NEED THIS IF SPPED IS VARIED
+#define IN1 11
+#define IN2 12
 #define LEDpin 11  // connect Red LED to pin 11 (PWM pin)
 
 //inputs
-#define PhotocellPin 0     // the cell and 10K pulldown are connected to a0
-#define CLOSED 9
-#define OPEN 10
+#define PhotocellPin 4     // the cell and 10K pulldown are connected to a4
+#define CLOSED 5
+#define OPEN A5
 
 //variables
 int photocellReading;     // the analog reading from the sensor divider
 int LEDbrightness;        // 
 const int CLOSE_THRESH = 100;
-const int OPEN_THRESH = 200;   //Some hysteresis required
-unsigned long MOTOR_TIME = 45000; //45sec to open/close
+const int OPEN_THRESH = 150;   //Some hysteresis required
+unsigned long MOTOR_TIME = 20000; //20sec to open/close
 unsigned long motor_timer;
 bool motor_action = false;
 
@@ -56,10 +57,10 @@ void setup(void) {
   Serial.begin(115200);   
   pinMode(OPEN, INPUT_PULLUP);
   pinMode(CLOSED, INPUT_PULLUP);
-  pinMode(CLOSE_REL, OUTPUT);
-  pinMode(OPEN_REL, OUTPUT);
-  digitalWrite(CLOSE_REL, LOW);
-  digitalWrite(OPEN_REL, LOW);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
   #ifdef production
     if (digitalRead((CLOSED) == HIGH) and (digitalRead(OPEN) == LOW)){
       state = STATE_DAY;
@@ -101,7 +102,7 @@ int find_state(int light){
     state = STATE_OPENING;
   }
   else if (light < CLOSE_THRESH){
-    Serial.println("switching to clsoing");
+    Serial.println("switching to closing");
     state = STATE_CLOSING;
   }else{
     Serial.println("staying in unkown");    
@@ -131,9 +132,11 @@ void closeDoor(){
     state = STATE_ERROR;
   }
   if (digitalRead(CLOSED) == HIGH){
-    digitalWrite(CLOSE_REL, HIGH);
+    //OR VICE VERSA
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
   }else{
-    digitalWrite(CLOSE_REL, LOW);
+    digitalWrite(IN1, LOW);
     if (digitalRead(OPEN) == HIGH){
       motor_action = false;    
       state = STATE_NIGHT;
@@ -150,9 +153,10 @@ void openDoor(){
     state = STATE_ERROR;
   }
   if (digitalRead(OPEN) == HIGH){
-    digitalWrite(OPEN_REL, HIGH);
+    digitalWrite(IN2, HIGH);
+    digitalWrite(IN1, LOW);
   }else{
-    digitalWrite(OPEN_REL, LOW);
+    digitalWrite(IN2, LOW);
     if (digitalRead(CLOSED) == HIGH){
       motor_action = false;
       state = STATE_DAY;
@@ -163,13 +167,19 @@ void openDoor(){
   }
 }
  
-void loop(void) {
+void loop() {
   photocellReading = analogRead(PhotocellPin);
   #ifdef debug
     Serial.print("State = ");
     Serial.print(myStates[state]);
     Serial.print("; Analog reading = ");
     Serial.println(photocellReading);     // the raw analog reading 
+    int openS = digitalRead(OPEN);
+    int closedS = digitalRead(CLOSED);
+    Serial.print("Open sensor = ");
+    Serial.print(openS);
+    Serial.print("; Closed sensor = ");
+    Serial.println(closedS);
     delay(1000); 
   #endif
   #ifdef test 
