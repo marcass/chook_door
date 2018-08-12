@@ -9,7 +9,7 @@ For more information see http://learn.adafruit.com/photocells */
 
 #define debug
 //#define test
-//#define sleep
+#define sleeping
 #define production
 
 /*********  State machine!  *************
@@ -43,7 +43,7 @@ int photocellReading;     // the analog reading from the sensor divider
 int LEDbrightness;        // 
 const int CLOSE_THRESH = 100;
 const int OPEN_THRESH = 150;   //Some hysteresis required
-unsigned long MOTOR_TIME = 20000; //20sec to open/close
+unsigned long MOTOR_TIME = 6000; //6sec to open/close
 unsigned long motor_timer;
 bool motor_action = false;
 
@@ -116,12 +116,13 @@ void goToSleep(){
     Serial.println("Going the fuck to sleep");
     delay(1000);
   #endif
-  #ifdef sleep
+  #ifdef sleeping
 //    sleep
-    isInterrupted = 0;
-    attachInterrupt;
-    LowPower.powerDown(SLEEP_8S); // sleep for 8s
-    delay(75); // allows the arduino to fully wake up.
+//    isInterrupted = 0;
+//    attachInterrupt;
+//    LowPower.powerDown(SLEEP_8S); // sleep for 8s
+//    delay(75); // allows the arduino to fully wake up.
+    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); 
   #endif
 }
 
