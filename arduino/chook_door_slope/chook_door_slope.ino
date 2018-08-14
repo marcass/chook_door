@@ -3,6 +3,9 @@
 //To help calculate slope
 #include "FastRunningMedian.h"
 FastRunningMedian<unsigned int,75, 200> lightMedian;
+//for checking buffer
+#include <CircularBuffer.h>
+CircularBuffer<int,5> buffer; // buffer capacity is 5
 /* Photocell sensor sketch for contorlling chook gate. 
  
 Connect one end of the photocell to 5V, the other end to Analog 0.
@@ -193,12 +196,18 @@ void loop() {
   int thisSlope = slope(analogRead(PhotocellPin));
   photocellReading = analogRead(PhotocellPin);
   #ifdef debug
+    buffer.push(photocellReading),
     Serial.print("State = ");
     Serial.print(myStates[state]);
     Serial.print("; Slope is  = ");
     Serial.print(slopes[thisSlope]);
     Serial.print("; Analog reading = ");
     Serial.println(photocellReading);     // the raw analog reading 
+    Serial.print("Buffer is: ");
+    for (int i = 0; i<=4;i++){
+      Serial.print(String(buffer[i])+", ");
+    }
+    Serial.println();
     int openS = digitalRead(OPEN);
     int closedS = digitalRead(CLOSED);
     Serial.print("Open sensor = ");
