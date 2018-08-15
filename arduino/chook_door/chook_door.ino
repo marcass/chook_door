@@ -9,7 +9,7 @@ For more information see http://learn.adafruit.com/photocells */
 
 #define debug
 //#define test
-#define sleeping
+//#define sleeping
 #define production
 
 /*********  State machine!  *************
