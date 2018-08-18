@@ -2,7 +2,7 @@
 #include "LowPower.h"
 //To help calculate slope
 #include "FastRunningMedian.h"
-FastRunningMedian<unsigned int,75, 200> lightMedian;
+FastRunningMedian<unsigned int,15, 200> lightMedian;
 //for checking buffer
 #include <CircularBuffer.h>
 CircularBuffer<int,5> buffer; // buffer capacity is 5
@@ -15,7 +15,7 @@ For more information see http://learn.adafruit.com/photocells */
 
 #define debug
 //#define test
-//#define sleeping
+#define sleeping
 #define production
 
 /*********  State machine!  *************
@@ -181,11 +181,11 @@ void openDoor(){
 
 int slope(int light){
   int m = lightMedian.getMedian();
-  if (m > light){
+  if (light < m){
     return SLOPE_DEC;
   }
-  else if (m < light){
-    return SLOPE_DEC;
+  else if (light > m){
+    return SLOPE_INC;
   }else{
     return SLOPE_SAME;
   }
